@@ -1,74 +1,102 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, FlatList, StyleSheet, Text, StatusBar, Image, ActivityIndicator } from 'react-native';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+// Sample static data to be displayed
+const DATA = [
+  {
+    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+    title: 'First Item',
+    avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+    first_name: 'John',
+    last_name: 'Doe'
+  },
+  {
+    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+    title: 'Second Item',
+    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+    first_name: 'Jane',
+    last_name: 'Smith'
+  },
+  {
+    id: '58694a0f-3da1-471f-bd96-145571e29d72',
+    title: 'Third Item',
+    avatar: 'https://randomuser.me/api/portraits/men/3.jpg',
+    first_name: 'James',
+    last_name: 'Brown'
+  },
+];
 
-export default function HomeScreen() {
+// UserCard to display individual user
+const UserCard = ({ user }: any) => (
+  <View style={styles.cardContainer}>
+    <Image style={styles.userImage} source={{ uri: user.avatar }} />
+    <Text style={styles.userName}>{user.first_name} {user.last_name}</Text>
+  </View>
+);
+
+const App = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Simulating API call with the DATA array for this example
+  useEffect(() => {
+    // If you want to simulate an API call, you can use this useEffect
+    // Otherwise, you can leave it empty if you only want static data
+  }, []);
+
+  // Function to simulate loading more data, if necessary
+  const fetchMore = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    setCurrentPage(currentPage + 1);
+    setIsLoading(false);
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container}>
+        <FlatList
+          data={DATA} // Use the static DATA array here
+          renderItem={({ item }) => <UserCard user={item} />} // Render each item using UserCard
+          keyExtractor={(item) => item.id} // Unique key for each item (id from DATA)
+          onEndReached={fetchMore} // Fetch more data when reaching the end of the list
+          onEndReachedThreshold={0.1}
+          ListFooterComponent={() => (isLoading ? <ActivityIndicator size="large" color="blue" /> : null)}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    marginTop: StatusBar.currentHeight || 0,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  cardContainer: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 10,
+    alignItems: 'center', // Added this to ensure the content is centered
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  userImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
+  userName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 10,
+  },
+  userInfo: {
+    fontSize: 16,
+    marginBottom: 5,
   },
 });
+
+export default App;
